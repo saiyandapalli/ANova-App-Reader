@@ -1,0 +1,36 @@
+.header {
+  margin-top: 5vh;
+  display: flex;
+  flex: 1;
+  background-color: aquamarine;
+  font-size: 40px;
+  border-width: 0;
+
+  border-bottom: 1px gray;
+  border-style: solid;
+}
+.header-application {
+  flex: 2;
+  align-self: flex-end;
+}
+.header-stats {
+  flex: 1;
+  font-size: 20px;
+  align-self: flex-end;
+  color: grey;
+}
+.container {
+  background-color: bisque;
+  position: absolute;
+  width: 70vw;
+  height: 100vh;
+  left: 15vw;
+}
+.form {
+  background-color: rgb(194, 110, 110);
+  border-width: 0;
+
+  border-bottom: 1px gray;
+  border-style: solid;
+  height: 70vh;
+}
