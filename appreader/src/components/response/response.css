@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
 .response-container {
   padding-left: 1vw;
   padding-right: 1vw;
@@ -9,6 +10,7 @@
   padding-bottom: 10px;
   font-size: 15px;
   font-weight: bold;
+  font-family: "Roboto", sans-serif;
 }
 
 .response-answer {
@@ -16,4 +18,5 @@
   padding-bottom: 10px;
   border-bottom: 1px solid #b7dee6;
   margin-bottom: 10px;
+  font-family: "Roboto", sans-serif;
 }
