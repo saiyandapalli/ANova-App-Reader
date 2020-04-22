@@ -5,19 +5,20 @@
   background-color: aquamarine;
   font-size: 40px;
   border-width: 0;
-
   border-bottom: 1px gray;
   border-style: solid;
 }
 .header-application {
   flex: 2;
-  align-self: flex-end;
+  padding-left: 1vw;
+  padding-right: 1vw;
 }
 .header-stats {
   flex: 1;
   font-size: 20px;
-  align-self: flex-end;
   color: grey;
+  padding-left: 1vw;
+  padding-right: 1vw;
 }
 .container {
   background-color: bisque;
@@ -33,4 +34,6 @@
   border-bottom: 1px gray;
   border-style: solid;
   height: 70vh;
+
+  overflow: scroll;
 }

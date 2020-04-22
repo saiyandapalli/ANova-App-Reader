@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import "./application.css";
+import Response from "../response/response";
 
 class Applications extends Component {
   //   constructor() {
@@ -14,7 +15,9 @@ class Applications extends Component {
           <div className="header-stats">apps left: 43</div>
           <div className="header-stats">yeses left: 43</div>
         </div>
-        <div className="form"></div>
+        <div className="form">
+          <Response></Response>
+        </div>
       </div>
     );
   }

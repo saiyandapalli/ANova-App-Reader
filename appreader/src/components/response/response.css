@@ -1,0 +1,19 @@
+.response-container {
+  padding-left: 1vw;
+  padding-right: 1vw;
+  overflow: scroll;
+}
+
+.response-question {
+  padding-top: 5px;
+  padding-bottom: 10px;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.response-answer {
+  padding-top: 5px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #b7dee6;
+  margin-bottom: 10px;
+}
