@@ -32,16 +32,7 @@ class Applications extends Component {
     return this.state.numYeses;
   }
 
-  airtableVoteHandler(applicantName, reviewerName, vote, flag, comments, id) {
-    fetch(global.DECISIONS_URL, {
-      body: "{\"records\": [{\"fields\": {\"Applicant Name\": \""+applicantName+"\",\"Reviewer Name\": \""+reviewerName+"\",\"Interview\": \""+vote+"\",\"Flag\": \""+flag+"\",\"Comments\": \""+comments+"\", \"ID\": \""+id+"\"}}]}",
-      headers: {
-        Authorization: "Bearer " + global.AIRTABLE_KEY,
-        "Content-Type": "application/json"
-      },
-      method: "POST"
-    });
-
+  airtableStateHandler(reviewerName) {
     fetch(global.DECISIONS_URL + "?filterByFormula=%7BReviewer%20Name%7D%20%3D%20%20%22"+reviewerName+"%22&view=Grid%20view", {
       headers: {
         Authorization: "Bearer " + global.AIRTABLE_KEY
@@ -82,6 +73,19 @@ class Applications extends Component {
           });
         }
       );
+  }
+
+  airtableVoteHandler(applicantName, reviewerName, vote, flag, comments, id) {
+    fetch(global.DECISIONS_URL, {
+      body: "{\"records\": [{\"fields\": {\"Applicant Name\": \""+applicantName+"\",\"Reviewer Name\": \""+reviewerName+"\",\"Interview\": \""+vote+"\",\"Flag\": \""+flag+"\",\"Comments\": \""+comments+"\", \"ID\": \""+id+"\"}}]}",
+      headers: {
+        Authorization: "Bearer " + global.AIRTABLE_KEY,
+        "Content-Type": "application/json"
+      },
+      method: "POST"
+    });
+
+    this.airtableStateHandler(reviewerName);
   }
 
   componentDidMount() {
