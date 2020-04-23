@@ -14,12 +14,17 @@
   flex: 2;
   padding-left: 1vw;
   padding-right: 1vw;
+  align-self: flex-end;
 }
 .header-stats {
   flex: 1;
+
   font-size: 20px;
   color: grey;
   font-family: "Noto Sans JP", sans-serif;
+  text-align: center;
+  align-self: flex-end;
+  padding-bottom: 8px;
 }
 .container {
   background-color: bisque;
@@ -31,10 +36,8 @@
 .form {
   background-color: rgb(194, 110, 110);
   border-width: 0;
-
   border-bottom: 1px gray;
   border-style: solid;
   height: 70vh;
-
   overflow: scroll;
 }

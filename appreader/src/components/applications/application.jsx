@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import "./application.css";
 import Response from "../response/response";
+import { NavigateNext } from "@material-ui/icons";
+import NoButton from "../buttons/noButton";
 
 class Applications extends Component {
   //   constructor() {
@@ -16,8 +18,9 @@ class Applications extends Component {
           <div className="header-stats">yeses left: 43</div>
         </div>
         <div className="form">
-          <Response></Response>
+          <Response />
         </div>
+        <NoButton />
       </div>
     );
   }
