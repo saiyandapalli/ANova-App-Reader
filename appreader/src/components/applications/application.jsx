@@ -24,8 +24,7 @@ class Applications extends Component {
   }
 
   getRemainingApps(){
-    const decisionNames = this.state.userDecisions.map(r => r.fields['Applicant Name']);
-    return this.state.allApplications.filter(r => !decisionNames.includes(r.fields['Name']));
+    return this.state.remainingApps;
   }
 
   getNumYeses() {
@@ -64,6 +63,7 @@ class Applications extends Component {
             isLoaded: true,
             allApplications: this.shuffle(result.records),
             numYeses: global.NUM_YES - state.userDecisions.filter(r => r.fields['Interview'] === "Yes").length,
+            remainingApps: result.records.filter(r => !(state.userDecisions.map(r => r.fields['Applicant Name'])).includes(r.fields['Name'])),
           }});
         },
         (error) => {
@@ -89,52 +89,7 @@ class Applications extends Component {
   }
 
   componentDidMount() {
-    
-    const reviewerName = this.state.reviewerName;
-
-    fetch(global.DECISIONS_URL + "?filterByFormula=%7BReviewer%20Name%7D%20%3D%20%20%22"+{reviewerName}+"%22&view=Grid%20view", {
-      headers: {
-        Authorization: "Bearer " + global.AIRTABLE_KEY
-      }
-    })
-      .then(res => res.json())
-      .then(
-        (result) => {
-          this.setState({
-            userDecisions: result.records,
-          });
-        }, 
-        (error) => {
-          this.setState({
-            error,
-          });
-        }
-      );
-    
-    fetch(global.APPLICATIONS_URL + "?view=Grid%20view", {
-      headers: {
-        Authorization: "Bearer " + global.AIRTABLE_KEY
-      }
-    })
-      .then(res => res.json())
-      .then(
-        (result) => {
-          this.setState((state) => {return {
-            isLoaded: true,
-            allApplications: this.shuffle(result.records)
-          }});
-        },
-        (error) => {
-          this.setState({
-            isLoaded: true,
-            error,
-          });
-        }
-      );  
-
-      this.setState({
-        numYeses: global.NUM_YES - this.state.userDecisions.filter(r => r.fields['Interview'] === "Yes")
-      })
+    this.airtableStateHandler(this.state.reviewerName);
   }
 
   formatFieldResponse(entry) {
@@ -155,7 +110,6 @@ class Applications extends Component {
     }
 
     const remainingApps = this.getRemainingApps()
-    console.log(remainingApps);
     
     const current = remainingApps[0];
     const fields = current.fields;
