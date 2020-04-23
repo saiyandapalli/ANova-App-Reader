@@ -32,6 +32,7 @@ class Applications extends Component {
   }
 
   airtableStateHandler(reviewerName) {
+
     fetch(global.DECISIONS_URL + "?filterByFormula=%7BReviewer%20Name%7D%20%3D%20%20%22"+reviewerName+"%22&view=Grid%20view", {
       headers: {
         Authorization: "Bearer " + global.AIRTABLE_KEY
@@ -59,11 +60,11 @@ class Applications extends Component {
       .then(res => res.json())
       .then(
         (result) => {
-          this.setState((state) => {return {
-            isLoaded: true,
+          this.setState((state) => { return {
             allApplications: this.shuffle(result.records),
             numYeses: global.NUM_YES - state.userDecisions.filter(r => r.fields['Interview'] === "Yes").length,
             remainingApps: result.records.filter(r => !(state.userDecisions.map(r => r.fields['Applicant Name'])).includes(r.fields['Name'])),
+            isLoaded: true,
           }});
         },
         (error) => {
@@ -73,6 +74,7 @@ class Applications extends Component {
           });
         }
       );
+
   }
 
   airtableVoteHandler(applicantName, reviewerName, vote, flag, comments, id) {
@@ -141,31 +143,33 @@ class Applications extends Component {
     console.log(body);
 
     return (
-      <div className="container">
-        <div className="header">
-          <div className="header-application">Application</div>
-          <div className="header-stats">apps left: {appsLeft}</div>
-          <div className="header-stats">yeses left: {numYeses}</div>
-        </div>
+      <div>
+        <div className="container">
+          <div className="header">
+            <div className="header-application">Application</div>
+            <div className="header-stats">apps left: {this.state.remainingApps.length}</div>
+            <div className="header-stats">yeses left: {this.state.numYeses}</div>
+          </div>
 
-        <div className="app-section">
-          <div className="form">{currentApp}</div>
-          <div className="app-options">
-            <textarea id="comments-textbox" className="comments-textbox" name="app" defaultValue="Comments"></textarea>
-            <div className="flag">
-              <input id="flag-checkbox" className="flag-checkbox" type="checkbox"></input>
-              <label htmlFor="flag-checkbox">Flag</label>
+          <div className="app-section">
+            <div className="form">{currentApp}</div>
+            <div className="app-options">
+              <textarea id="comments-textbox" className="comments-textbox" name="app" defaultValue="Comments"></textarea>
+              <div className="flag">
+                <input id="flag-checkbox" className="flag-checkbox" type="checkbox"></input>
+                <label htmlFor="flag-checkbox">Flag</label>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="vote">
-          <button className="no-button" onClick={() => 
-            this.airtableVoteHandler(applicantName, reviewerName, "No", flag, comments, id)}>No</button>
-          <button className="no-button" onClick={() => 
-            window.location.reload()}>Skip</button>
-          <button className="no-button" onClick={() => 
-            this.airtableVoteHandler(applicantName, reviewerName, "Yes", flag, comments, id)}>Yes</button>
+          <div className="vote">
+            <button className="no-button" onClick={() => 
+              this.airtableVoteHandler(applicantName, reviewerName, "No", flag, comments, id)}>No</button>
+            <button className="no-button" onClick={() => 
+              window.location.reload()}>Skip</button>
+            <button className="no-button" onClick={() => {
+              this.airtableVoteHandler(applicantName, reviewerName, "Yes", flag, comments, id);}}>Yes</button>
+          </div>
         </div>
       </div>
     );
