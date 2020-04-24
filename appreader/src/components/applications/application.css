@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap");
+
 .header {
   margin-top: 5vh;
   display: flex;
@@ -34,10 +35,18 @@
   left: 15vw;
 }
 .form {
-  background-color: rgb(194, 110, 110);
+  background-color: green;
   border-width: 0;
   border-bottom: 1px gray;
   border-style: solid;
   height: 70vh;
   overflow: scroll;
+}
+.footer {
+  margin-top: 5vh;
+  display: flex;
+  flex: 1;
+  background-color: aquamarine;
+  border-width: 0;
+  justify-content: center;
 }

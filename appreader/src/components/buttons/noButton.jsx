@@ -1,7 +1,13 @@
-import { Check } from "@material-ui/icons";
-import React from "react";
+import React, { Component } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const App = () => {
-  return <Check />;
-};
-export default App;
+class NoButton extends Component {
+  render() {
+    return (
+      <button className="round-btn center-btn space-btn">
+        <FontAwesomeIcon icon="times" />
+      </button>
+    );
+  }
+}
+export default NoButton;

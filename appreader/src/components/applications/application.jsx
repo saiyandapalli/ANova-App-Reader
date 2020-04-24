@@ -1,8 +1,11 @@
 import React, { Component } from "react";
 import "./application.css";
+import "../buttons/buttons.css";
 import Response from "../response/response";
-import { NavigateNext } from "@material-ui/icons";
+import CheckButton from "../buttons/checkButton";
 import NoButton from "../buttons/noButton";
+import StarButton from "../buttons/starButton";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 class Applications extends Component {
   //   constructor() {
@@ -20,7 +23,13 @@ class Applications extends Component {
         <div className="form">
           <Response />
         </div>
-        <NoButton />
+        <div className="footer">
+          <CheckButton />
+          <button className="round-btn center-btn space-btn">
+            <FontAwesomeIcon icon="angle-double-right" />
+          </button>
+          <NoButton />
+        </div>
       </div>
     );
   }
