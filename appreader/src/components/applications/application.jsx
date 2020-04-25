@@ -130,7 +130,7 @@ class Applications extends Component {
 
   /** 
    * Displays each question and response as a new paragraph line. 
-   * @param {dictionary} fields: response fields
+   * @param {Object} fields: question : response dict
    * @param {string} k: key in fields dict, usually the app question
    * @returns paragraph response from the app (CSS app-line)
   */
@@ -146,7 +146,10 @@ class Applications extends Component {
     }
   }
 
-  /** OPTIONAL: Orders questions based on global.QUESTION_ORDER */
+  /** 
+   * OPTIONAL: Orders questions based on global.QUESTION_ORDER 
+   * @param {Object} fields: question : response dict
+  */
   orderFields(fields) {
     return global.QUESTION_ORDER ? global.QUESTION_ORDER.slice().map(i => Object.keys(fields)[i]) : Object.keys(fields);
   }
@@ -171,7 +174,7 @@ class Applications extends Component {
   }
 
   /** 
-   * Handles the event where the user flags the app
+   * Handles the event where the user checks the flag check box to flag an app
    * @param {event} event: change event 
   */
   handleFlagChange(event) {
@@ -202,39 +205,36 @@ class Applications extends Component {
     const reviewerName = this.state.reviewerName;
     const currentApp = this.renderApp(fields);
 
-    // TODO: read these from the actual fields
-    const flag = "No";
-    const comments = "";
-
     return (
       <div>
         <div className="container">
           <div className="header">
             <div className="header-application">Application</div>
-            <div className="header-stats">apps left: {this.state.remainingApps.length}</div>
-            <div className="header-stats">yeses left: {this.state.numYeses}</div>
+            <div className="header-stats">Apps Remaining: {this.state.remainingApps.length}</div>
+            <div className="header-stats">Yeses Remaining: {this.state.numYeses}</div>
           </div>
 
           <div className="app-section">
-            <div className="form">{currentApp}</div>
+            <div className="app-view">{currentApp}</div>
             <div className="app-options">
-              <p className="comments-label">Comment:</p>
-              <textarea id="comments-textbox" className="comments-textbox" name="app" value={this.state.comments} onChange={(event) => this.handleCommentsChange(event)}></textarea>
+              <h4 className="comments-label">Comment:</h4>
+              <textarea id="comments-textbox" className="comments-textbox" name="app" value={this.state.comments} onChange={this.handleCommentsChange.bind(this)}></textarea>
               <div className="flag">
                 <input id="flag-checkbox" className="flag-checkbox" type="checkbox" onChange={this.handleFlagChange.bind(this)}></input>
                 <label htmlFor="flag-checkbox">Flag</label>
               </div>
+              <div className="vote">
+                <h3 className="vote-label">Vote</h3>
+                <button className="no-button" disabled={this.state.numYeses <= 0} onClick={() => {
+                  this.airtableVoteHandler(applicantName, reviewerName, "No", this.state.flag, this.state.comments, id); window.scrollTo(0,0);}}>No</button>
+                <button className="skip-button" onClick={() => {
+                  this.airtableStateHandler(reviewerName); window.scrollTo(0,0);}}>Skip</button>
+                <button className="yes-button" disabled={this.state.numYeses <= 0} onClick={() => {
+                  this.airtableVoteHandler(applicantName, reviewerName, "Yes", this.state.flag, this.state.comments, id); window.scrollTo(0,0);}}>Yes</button>
+              </div>
             </div>
           </div>
-
-          <div className="vote">
-            <button className="no-button" disabled={this.state.numYeses <= 0} onClick={() => 
-              this.airtableVoteHandler(applicantName, reviewerName, "No", this.state.flag, this.state.comments, id)}>No</button>
-            <button className="skip-button" onClick={() => 
-              this.airtableStateHandler(reviewerName)}>Skip</button>
-            <button className="yes-button" disabled={this.state.numYeses <= 0} onClick={() => {
-              this.airtableVoteHandler(applicantName, reviewerName, "Yes", this.state.flag, this.state.comments, id);}}>Yes</button>
-          </div>
+          {/* <div></div> * remove this line to eliminate app scrolling */}
         </div>
       </div>
     );
