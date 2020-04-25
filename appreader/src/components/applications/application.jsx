@@ -5,24 +5,27 @@ import "../../global.js";
 class Applications extends Component {
   /**
    * Creates an instance of the Applications page.
-   * 
    * @constructor
    */
   constructor() {
     super();
-    // TODO: retrieve all apps that the user still needs to review 
     this.state = {
       error: null,
       isLoaded: false,
       userDecisions: [],
       allApplications: [],
       remainingApps: [],
+      comments: '',
+      flag: "No",
       numYeses: null,
-      reviewerName: "test", // TODO: keep track of the current user
+      reviewerName: "test", // TODO: keep track of the current user via sign-in
     }
   }
   
-  /** Formats field responses */
+  /** 
+   * Formats field responses
+   * @param {Object} entry: field response to be formatted (can be string or Object[])
+  */
   formatFieldResponse(entry) {
     // convert [a,b,c] to "a, b, c" if necessary
     // for multi select questions like "Which programming languages do you know?"
@@ -43,6 +46,7 @@ class Applications extends Component {
    * (1) GET from Decision Table, filter by Reviewer Name
    * (2) GET from All Applications Table
    * from (2) remove all records with matching IDs in (1)
+   * @param {string} reviewerName: name of reviewer
     */
   airtableStateHandler(reviewerName) {
     const formula = "?filterByFormula=%7BReviewer%20Name%7D%20%3D%20%20%22"
@@ -92,7 +96,15 @@ class Applications extends Component {
       return true;
   }
 
-  /** Asynchronously submits a vote via POST and calls airtableStateHandler. */
+  /** 
+   * Asynchronously submits a vote via POST and calls airtableStateHandler. 
+   * @param {string} applicantName: applicant name
+   * @param {string} reviewerName: name of reviewer
+   * @param {string} vote: "Yes" or "No" (interview decision)
+   * @param {string} flag: "Yes" or "No" (mark as flagged)
+   * @param {string} comments: comments for this application
+   * @param {string} id: application ID from the All Applications Table
+  */
   async airtableVoteHandler(applicantName, reviewerName, vote, flag, comments, id) {
     try {
       const r = await fetch(global.DECISIONS_URL, {
@@ -104,11 +116,68 @@ class Applications extends Component {
         method: "POST"
       });
       console.log(await r.text());
+      this.setState({
+        comments: '',
+        flag: false,
+      });
       this.airtableStateHandler(reviewerName);
+      console.log(this.state)
     }
     catch (err) {
       console.log("fetch failed [VOTE]", err);
     }
+  }
+
+  /** 
+   * Displays each question and response as a new paragraph line. 
+   * @param {dictionary} fields: response fields
+   * @param {string} k: key in fields dict, usually the app question
+   * @returns paragraph response from the app (CSS app-line)
+  */
+  renderAppLine(fields, k) {
+    const fieldResponse = this.formatFieldResponse(fields[k]);
+    if (!global.IGNORED_FIELDS.includes(k)) { // certain fields removed to eliminate app reader bias
+      return (
+        <div className="app-question" key={k}>
+          <p className="app-field"><b>{k}</b></p>
+          <p className="app-response">{fieldResponse}</p>
+        </div>
+      );
+    }
+  }
+
+  /** OPTIONAL: Orders questions based on global.QUESTION_ORDER */
+  orderFields(fields) {
+    return global.QUESTION_ORDER ? global.QUESTION_ORDER.slice().map(i => Object.keys(fields)[i]) : Object.keys(fields);
+  }
+
+  /**
+   * Displays the application
+   * @param {dictionary} fields 
+   */
+  renderApp(fields) {
+    const orderedFields = this.orderFields(fields);
+    return orderedFields.map((k) => this.renderAppLine(fields, k));
+  }
+
+  /** 
+   * Handles the event where the user comments something
+   * @param {event} event: change event
+  */
+  handleCommentsChange(event) {
+    this.setState({
+      comments: event.target.value,
+    });
+  }
+
+  /** 
+   * Handles the event where the user flags the app
+   * @param {event} event: change event 
+  */
+  handleFlagChange(event) {
+    this.setState({
+      flag: event.target.checked ? "Yes" : "No",
+    });
   }
 
   /** Sets up app reader component */
@@ -129,19 +198,9 @@ class Applications extends Component {
     const current = this.state.remainingApps[0];
     const fields = current.fields;
     const id = current.id;
-
-    // change the values inside fields[...] if corresponding field names change
     const applicantName = fields["Name"];
     const reviewerName = this.state.reviewerName;
-
-    const currentApp = Object.keys(fields).map((k) => {
-      const fieldResponse = this.formatFieldResponse(fields[k]);
-      return (
-        <div className="app-line" key={k}>
-          <p>{k}<br />{fieldResponse}</p>
-        </div>
-      );
-    });
+    const currentApp = this.renderApp(fields);
 
     // TODO: read these from the actual fields
     const flag = "No";
@@ -159,21 +218,22 @@ class Applications extends Component {
           <div className="app-section">
             <div className="form">{currentApp}</div>
             <div className="app-options">
-              <textarea id="comments-textbox" className="comments-textbox" name="app" defaultValue="Comments"></textarea>
+              <p className="comments-label">Comment:</p>
+              <textarea id="comments-textbox" className="comments-textbox" name="app" value={this.state.comments} onChange={(event) => this.handleCommentsChange(event)}></textarea>
               <div className="flag">
-                <input id="flag-checkbox" className="flag-checkbox" type="checkbox"></input>
+                <input id="flag-checkbox" className="flag-checkbox" type="checkbox" onChange={this.handleFlagChange.bind(this)}></input>
                 <label htmlFor="flag-checkbox">Flag</label>
               </div>
             </div>
           </div>
 
           <div className="vote">
-            <button className="no-button" onClick={() => 
-              this.airtableVoteHandler(applicantName, reviewerName, "No", flag, comments, id)}>No</button>
-            <button className="no-button" onClick={() => 
+            <button className="no-button" disabled={this.state.numYeses <= 0} onClick={() => 
+              this.airtableVoteHandler(applicantName, reviewerName, "No", this.state.flag, this.state.comments, id)}>No</button>
+            <button className="skip-button" onClick={() => 
               this.airtableStateHandler(reviewerName)}>Skip</button>
-            <button className="no-button" onClick={() => {
-              this.airtableVoteHandler(applicantName, reviewerName, "Yes", flag, comments, id);}}>Yes</button>
+            <button className="yes-button" disabled={this.state.numYeses <= 0} onClick={() => {
+              this.airtableVoteHandler(applicantName, reviewerName, "Yes", this.state.flag, this.state.comments, id);}}>Yes</button>
           </div>
         </div>
       </div>
