@@ -3,6 +3,11 @@ import "./application.css";
 import "../../global.js";
 
 class Applications extends Component {
+  /**
+   * Creates an instance of the Applications page.
+   * 
+   * @constructor
+   */
   constructor() {
     super();
     // TODO: retrieve all apps that the user still needs to review 
@@ -17,13 +22,29 @@ class Applications extends Component {
     }
   }
   
-  /** Destructively shuffles an input array. */
+  /** Formats field responses */
+  formatFieldResponse(entry) {
+    // convert [a,b,c] to "a, b, c" if necessary
+    // for multi select questions like "Which programming languages do you know?"
+    return (typeof(entry) !== "string") ? Array.from(entry).join(", ") : entry;
+  }
+
+  /** Destructively shuffles an input array. 
+   * @returns shuffled array
+  */
   shuffle(array) {
     array.sort(() => Math.random() - .5);
     return array;
   }
 
-  async airtableStateHandler(reviewerName) {
+  /** 
+   * Updates state variables to reflect current Airtable state, 
+   * To find all applications a reviewer has yet to vote on:
+   * (1) GET from Decision Table, filter by Reviewer Name
+   * (2) GET from All Applications Table
+   * from (2) remove all records with matching IDs in (1)
+    */
+  airtableStateHandler(reviewerName) {
     const formula = "?filterByFormula=%7BReviewer%20Name%7D%20%3D%20%20%22"
     fetch(global.DECISIONS_URL + formula + reviewerName + "%22&view=Grid%20view", {
         headers: {
@@ -52,7 +73,7 @@ class Applications extends Component {
           this.setState((state) => { return {
             allApplications: this.shuffle(result.records),
             numYeses: global.NUM_YES - state.userDecisions.filter(r => r.fields['Interview'] === "Yes").length,
-            remainingApps: result.records.filter(r => !(state.userDecisions.map(r => r.fields['Applicant Name'])).includes(r.fields['Name'])),
+            remainingApps: result.records.filter(r => !(state.userDecisions.map(r => r.fields['ID'])).includes(r.id)),
             isLoaded: true,
           }});
         },
@@ -71,6 +92,7 @@ class Applications extends Component {
       return true;
   }
 
+  /** Asynchronously submits a vote via POST and calls airtableStateHandler. */
   async airtableVoteHandler(applicantName, reviewerName, vote, flag, comments, id) {
     try {
       const r = await fetch(global.DECISIONS_URL, {
@@ -89,14 +111,9 @@ class Applications extends Component {
     }
   }
 
+  /** Sets up app reader component */
   componentDidMount() {
     this.airtableStateHandler(this.state.reviewerName);
-  }
-
-  formatFieldResponse(entry) {
-    // convert [a,b,c] to "a, b, c" if necessary
-    // for multi select questions like "Which programming languages do you know?"
-    return (typeof(entry) !== "string") ? Array.from(entry).join(", ") : entry;
   }
 
   render() {
@@ -129,9 +146,6 @@ class Applications extends Component {
     // TODO: read these from the actual fields
     const flag = "No";
     const comments = "";
-
-    const body = "{\"records\": [{\"fields\": {\"Applicant Name\": \""+applicantName+"\",\"Reviewer Name\": \""+reviewerName+"\", \"Interview\": \"No\", \"Flag\": \""+flag+"\", \"Comments\": \""+comments+"\", \"ID\": \""+id+"\"}}]}";
-    console.log(body);
 
     return (
       <div>
