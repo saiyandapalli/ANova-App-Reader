@@ -63,6 +63,9 @@
   text-indent: 10px;
   border-width: 1px;
 }
+.reviewer-name {
+  bottom: 10vh;
+}
 .app-options textarea {
   display: table-cell;
   height: 40vh;

@@ -207,7 +207,7 @@ class Applications extends Component {
       return <div>Loading...</div>
     }
     
-    if (!this.state.remainingApps.length || this.state.numYeses == 0) {
+    if (!this.state.remainingApps.length || this.state.numYeses === 0) {
       const resource = !this.state.remainingApps.length ? "apps" : "yeses"
       toaster.notify(<div className="toast"><h4 className="toast-text">No {resource} remaining!</h4></div>, {
         position: 'bottom',
@@ -225,6 +225,7 @@ class Applications extends Component {
             <div className="app-section">
               <div className="app-view"></div>
               <div className="app-options">
+                <h3 className="reviewer-name">Reviewer: {this.state.reviewerName}</h3>
                 <h4 className="comments-label">Comment:</h4>
                 <textarea id="comments-textbox" className="comments-textbox" name="app" value={this.state.comments} disabled="true"></textarea>
                 <div className="flag">
@@ -268,6 +269,7 @@ class Applications extends Component {
           <div className="app-section">
             <div className="app-view">{currentApp}</div>
             <div className="app-options">
+              <h3 className="reviewer-name">Reviewer: {this.state.reviewerName}</h3>
               <h4 className="comments-label">Comment:</h4>
               <textarea id="comments-textbox" className="comments-textbox" name="app" value={this.state.comments} onChange={this.handleCommentsChange.bind(this)}></textarea>
               <div className="flag">
