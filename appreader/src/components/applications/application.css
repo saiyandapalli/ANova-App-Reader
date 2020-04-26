@@ -59,7 +59,8 @@
   align-self: flex-end;
   flex-grow: 1;
   display: table;
-  border-style: solid;
+  border-bottom: solid;
+  text-indent: 10px;
   border-width: 1px;
 }
 .app-options textarea {
@@ -68,9 +69,22 @@
   font-family: Verdana, Tahoma, Arial, Helvetica, sans-serif;
   font-size: 82%;
   overflow-y:scroll;
+  border-style: solid;
+  border-radius: 10px;
 }
 .app-options #flag-checkbox {
   display: table-cell;
   font-family: Verdana, Tahoma, Arial, Helvetica, sans-serif;
   font-size: 82%;
+}
+/* toast */
+.toast {
+  background-color: #00aaba;
+  width: 10vw;
+  height: 5vw;
+  border-style: solid;
+  border-radius: 15px;
+}
+.toast-text {
+  vertical-align: middle;
 }

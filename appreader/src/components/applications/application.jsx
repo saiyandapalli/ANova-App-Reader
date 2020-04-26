@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import toaster from 'toasted-notes'; // requires react-spring module! yarn add toasted-notes; npm install react-spring;
 import "./application.css";
 import "../../global.js";
 
@@ -24,11 +25,10 @@ class Applications extends Component {
   
   /** 
    * Formats field responses
+   * for multiple select questions like "Which programming languages do you know?", converts Object [a,b,c] to "a, b, c"
    * @param {Object} entry: field response to be formatted (can be string or Object[])
   */
   formatFieldResponse(entry) {
-    // convert [a,b,c] to "a, b, c" if necessary
-    // for multi select questions like "Which programming languages do you know?"
     return (typeof(entry) !== "string") ? Array.from(entry).join(", ") : entry;
   }
 
@@ -118,8 +118,14 @@ class Applications extends Component {
       console.log(await r.text());
       this.setState({
         comments: '',
-        flag: false,
+        flag: "No",
       });
+
+      toaster.notify(<div className="toast"><h4 className="toast-text">Voted {vote} for {applicantName}!</h4></div>, {
+        duration: 1000,
+        position: 'bottom'
+      })
+
       this.airtableStateHandler(reviewerName);
       console.log(this.state)
     }
@@ -178,8 +184,10 @@ class Applications extends Component {
    * @param {event} event: change event 
   */
   handleFlagChange(event) {
+    const flagState = event.target.checked ? "Yes" : "No";
+    console.log(flagState)
     this.setState({
-      flag: event.target.checked ? "Yes" : "No",
+      flag: flagState,
     });
   }
 
@@ -198,6 +206,47 @@ class Applications extends Component {
       return <div>Loading...</div>
     }
     
+    if (!this.state.remainingApps.length) {
+      toaster.notify(<div className="toast"><h4 className="toast-text">No apps remaining!</h4></div>, {
+        position: 'bottom',
+        duration: null,
+      }); // TODO: fix! appears twice for some reason
+      return (
+        <div>
+          <div className="container">
+            <div className="header">
+              <div className="header-application">Application</div>
+              <div className="header-stats">Apps Remaining: 0</div>
+              <div className="header-stats">Yeses Remaining: {this.state.numYeses}</div>
+            </div>
+  
+            <div className="app-section">
+              <div className="app-view"></div>
+              <div className="app-options">
+                <h4 className="comments-label">Comment:</h4>
+                <textarea id="comments-textbox" className="comments-textbox" name="app" value={this.state.comments} disabled="true"></textarea>
+                <div className="flag">
+                  <input id="flag-checkbox" className="flag-checkbox" type="checkbox" checked={this.state.flag==="Yes"} disabled="true"></input>
+                  <label htmlFor="flag-checkbox">Flag</label>
+                </div>
+                <div className="vote">
+                  <h3 className="vote-label">Vote</h3>
+                  <button className="no-button" disabled="true">
+                    No
+                  </button>
+                  <button className="skip-button" disabled="true">
+                    Skip
+                  </button>
+                  <button className="yes-button" disabled="true">
+                    Yes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
     const current = this.state.remainingApps[0];
     const fields = current.fields;
     const id = current.id;
@@ -220,21 +269,26 @@ class Applications extends Component {
               <h4 className="comments-label">Comment:</h4>
               <textarea id="comments-textbox" className="comments-textbox" name="app" value={this.state.comments} onChange={this.handleCommentsChange.bind(this)}></textarea>
               <div className="flag">
-                <input id="flag-checkbox" className="flag-checkbox" type="checkbox" onChange={this.handleFlagChange.bind(this)}></input>
+                <input id="flag-checkbox" className="flag-checkbox" type="checkbox" checked={this.state.flag==="Yes"} onChange={this.handleFlagChange.bind(this)}></input>
                 <label htmlFor="flag-checkbox">Flag</label>
               </div>
               <div className="vote">
                 <h3 className="vote-label">Vote</h3>
                 <button className="no-button" disabled={this.state.numYeses <= 0} onClick={() => {
-                  this.airtableVoteHandler(applicantName, reviewerName, "No", this.state.flag, this.state.comments, id); window.scrollTo(0,0);}}>No</button>
+                  this.airtableVoteHandler(applicantName, reviewerName, "No", this.state.flag, this.state.comments, id); window.scrollTo(0,0);}}>
+                  No
+                </button>
                 <button className="skip-button" onClick={() => {
-                  this.airtableStateHandler(reviewerName); window.scrollTo(0,0);}}>Skip</button>
+                  this.airtableStateHandler(reviewerName); window.scrollTo(0,0);}}>
+                  Skip
+                </button>
                 <button className="yes-button" disabled={this.state.numYeses <= 0} onClick={() => {
-                  this.airtableVoteHandler(applicantName, reviewerName, "Yes", this.state.flag, this.state.comments, id); window.scrollTo(0,0);}}>Yes</button>
+                  this.airtableVoteHandler(applicantName, reviewerName, "Yes", this.state.flag, this.state.comments, id); window.scrollTo(0,0);}}>
+                  Yes
+                </button>
               </div>
             </div>
           </div>
-          {/* <div></div> * remove this line to eliminate app scrolling */}
         </div>
       </div>
     );
