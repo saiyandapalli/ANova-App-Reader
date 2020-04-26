@@ -32,7 +32,8 @@ class Applications extends Component {
     return (typeof(entry) !== "string") ? Array.from(entry).join(", ") : entry;
   }
 
-  /** Destructively shuffles an input array. 
+  /** 
+   * Destructively shuffles an input array. 
    * @returns shuffled array
   */
   shuffle(array) {
