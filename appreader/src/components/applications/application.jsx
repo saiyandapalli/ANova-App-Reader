@@ -206,8 +206,9 @@ class Applications extends Component {
       return <div>Loading...</div>
     }
     
-    if (!this.state.remainingApps.length) {
-      toaster.notify(<div className="toast"><h4 className="toast-text">No apps remaining!</h4></div>, {
+    if (!this.state.remainingApps.length || this.state.numYeses == 0) {
+      const resource = !this.state.remainingApps.length ? "apps" : "yeses"
+      toaster.notify(<div className="toast"><h4 className="toast-text">No {resource} remaining!</h4></div>, {
         position: 'bottom',
         duration: null,
       }); // TODO: fix! appears twice for some reason
@@ -216,7 +217,7 @@ class Applications extends Component {
           <div className="container">
             <div className="header">
               <div className="header-application">Application</div>
-              <div className="header-stats">Apps Remaining: 0</div>
+              <div className="header-stats">Apps Remaining: {this.state.remainingApps.length}</div>
               <div className="header-stats">Yeses Remaining: {this.state.numYeses}</div>
             </div>
   
